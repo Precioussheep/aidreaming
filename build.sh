@@ -11,16 +11,16 @@ if [ ! -d "$REPOS_DIR" ]; then
     mkdir -p "$REPOS_DIR"
 fi
 
-if git --version >/dev/null 2>&1; then 
+# check git is installed
+if git --version >/dev/null 2>&1; then
     echo "Git is installed, proceding."
-else 
+else
     echo "Git is not installed"
-    echo "This script will now install git" 
+    echo "This script will now install git"
     sudo apt-get update
     sudo DEBIAN_FRONTEND=noninteractive apt-get install git -y
 fi
 
-# clone down Fooocus
 if [ ! -d "$REPOS_DIR/Fooocus" ]; then
     echo "Fooocus not present. Performing a pull to ensure we've got everything"
     git clone https://github.com/lllyasviel/Fooocus.git $REPOS_DIR/Fooocus
@@ -35,7 +35,7 @@ git -C $REPOS_DIR/Fooocus checkout $FOOOCUS_COMMIT
 
 # place Dockerfile and requirements to Fooocus directory and begin building the container state
 # will always overwrite what is present
-cp $(pwd)/Dockerfile-aidreaming $REPOS_DIR/Fooocus/
+cp $(pwd)/aidreaming.dockerfile $REPOS_DIR/Fooocus/
 cp $(pwd)/requirements_aidreaming.txt $REPOS_DIR/Fooocus/
 
 echo ""
@@ -98,7 +98,7 @@ sed -i "s/# cuda_malloc()/cuda_malloc()/" $REPOS_DIR/Fooocus/launch.py
 # build container
 echo "Building the docker image"
 sleep 1
-sudo docker build --pull --no-cache -f $REPOS_DIR/Fooocus/Dockerfile-aidreaming -t aidreaming:0.0.1 $REPOS_DIR/Fooocus
+sudo docker build --pull --no-cache -f $REPOS_DIR/Fooocus/aidreaming.dockerfile -t aidreaming:0.0.1 $REPOS_DIR/Fooocus
 
 echo ""
 echo "You can now run the container with"
